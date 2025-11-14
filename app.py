@@ -5,15 +5,23 @@ import os
 from dotenv import load_dotenv
 from UzTransliterator import UzTransliterator
 
-# .env faylini yuklash
+# .env faylini yuklash (local development uchun)
 load_dotenv()
 
-# OpenAI client - API key ni environment variable dan olish
-api_key = os.getenv("OPENAI_API_KEY")
-if not api_key:
-    st.error("❌ OPENAI_API_KEY environment variable topilmadi! Iltimos, .env fayl yoki environment variable sozlang.")
-    st.info("💡 .env fayl yaratib, ichiga quyidagini yozing:\n`OPENAI_API_KEY=sk-...`")
-    st.stop()
+# OpenAI client - API key ni olish
+# Streamlit Cloud da st.secrets, local da .env fayl
+try:
+    # Streamlit Cloud Secrets (production)
+    api_key = st.secrets["OPENAI_API_KEY"]
+except (KeyError, FileNotFoundError):
+    # Local development (.env fayl)
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        st.error("❌ OPENAI_API_KEY topilmadi!")
+        st.info("💡 **Local development:** `.env` fayl yaratib, ichiga quyidagini yozing:\n`OPENAI_API_KEY=sk-...`\n\n"
+                "💡 **Streamlit Cloud:** App Settings > Secrets bo'limida quyidagini yozing:\n"
+                "```toml\nOPENAI_API_KEY = \"sk-...\"\n```")
+        st.stop()
 
 try:
     client = OpenAI(api_key=api_key)
@@ -31,12 +39,20 @@ except Exception as e:
 
 transliterator = UzTransliterator.UzTransliterator()
 
-# Assistant ID ni environment variable dan olish
-ASSISTANT_ID = os.getenv("OPENAI_ASSISTANT_ID", "assistant_id_not_found")
-if ASSISTANT_ID == "assistant_id_not_found":
-    st.error("❌ **Assistant ID topilmadi!**")
-    st.info("💡 Iltimos, `.env` faylda Assistant ID ni yozing.")
-    st.stop()
+# Assistant ID ni olish
+# Streamlit Cloud da st.secrets, local da .env fayl
+try:
+    # Streamlit Cloud Secrets (production)
+    ASSISTANT_ID = st.secrets["OPENAI_ASSISTANT_ID"]
+except (KeyError, FileNotFoundError):
+    # Local development (.env fayl)
+    ASSISTANT_ID = os.getenv("OPENAI_ASSISTANT_ID")
+    if not ASSISTANT_ID:
+        st.error("❌ **Assistant ID topilmadi!**")
+        st.info("💡 **Local development:** `.env` faylda quyidagini yozing:\n`OPENAI_ASSISTANT_ID=asst-...`\n\n"
+                "💡 **Streamlit Cloud:** App Settings > Secrets bo'limida quyidagini yozing:\n"
+                "```toml\nOPENAI_ASSISTANT_ID = \"asst-...\"\n```")
+        st.stop()
 
 # Sahifa sozlamalari
 st.set_page_config(
