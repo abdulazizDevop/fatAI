@@ -134,9 +134,9 @@ OPENAI_ASSISTANT_ID = "asst_***"
 
 ## 📄 Litsenziya
 
-Ochiq manba loyiha
+MIT
 
 ## 👤 Muallif
 
-Fatvo AI Team
+Abdulaziz Olimov
 
