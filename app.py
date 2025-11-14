@@ -82,21 +82,6 @@ def preprocess_question(question):
         st.warning(f"⚠️ Transliteration xatolik: {e}")
         return question, "failed"
 
-def postprocess_response(response):
-    """
-    Javobni qayta ishlash: har doim kiril → lotin konversiya qiladi
-    """
-    try:
-        # Har doim kiril → lotin konversiya qilish
-        response_lat = transliterator.transliterate(
-            response,
-            from_="cyr",
-            to="lat"
-        )
-        return response_lat, "converted"
-    except Exception as e:
-        st.warning(f"⚠️ Javob konversiya xatolik: {e}")
-        return response, "failed"
 
 # Thread yaratish funktsiyasi
 def get_or_create_thread():
@@ -187,20 +172,15 @@ if prompt := st.chat_input("Savolingizni yozing (lotin yozuvda)..."):
                     )
                     
                     # Eng oxirgi javob (assistant) - kiril yozuvda
-                    response_cyr = messages.data[0].content[0].text.value
+                    response = messages.data[0].content[0].text.value
                     
-                    # Javobni lotin yozuvga o'girish (kiril → lotin)
-                    response_lat, response_status = postprocess_response(response_cyr)
-                    
-                    # Javobni ko'rsatish (lotin yozuvda)
-                    st.markdown(response_lat)
+                    # Javobni ko'rsatish (kiril yozuvda)
+                    st.markdown(response)
                     
                     # Session ga saqlash
                     st.session_state.messages.append({
                         "role": "assistant",
-                        "content": response_lat,  # Lotin yozuvda saqlanadi
-                        "converted": response_status == "converted",
-                        "original": response_cyr if response_status == "converted" else None  # Kiril versiyasi
+                        "content": response  # Kiril yozuvda saqlanadi
                     })
                 elif run.status == 'failed':
                     error_msg = f"❌ Xatolik yuz berdi: {run.last_error.message if run.last_error else run.status}"
@@ -234,7 +214,7 @@ with st.sidebar:
     kitobiga asoslangan AI yordamchi.
     
     **Imkoniyatlar:**
-    - ✅ O'zbek tili (lotin yozuv - kirilga o'giriladi va javob lotinda qaytariladi)
+    - ✅ O'zbek tili (lotin yozuv - kirilga o'giriladi, javob kiril yozuvda)
     - ✅ 7 ta fatvolar kitobidan qidiruv
     - ✅ Aniq manbalar bilan javob
     - ✅ 24/7 ishlash
@@ -273,5 +253,5 @@ with st.sidebar:
     
     st.header("🔧 Texnik ma'lumot")
     st.caption("✅ Multi-user support: Har bir foydalanuvchi o'z thread ID bilan ishlaydi")
-    st.caption("✅ Tarjima: Lotin → Kiril (savol), Kiril → Lotin (javob)")
+    st.caption("✅ Tarjima: Lotin → Kiril (savol), javob kiril yozuvda")
     st.caption("✅ Error handling: Xatoliklarni to'g'ri boshqarish")
