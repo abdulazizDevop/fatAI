@@ -18,9 +18,6 @@ except (KeyError, FileNotFoundError):
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         st.error("❌ OPENAI_API_KEY topilmadi!")
-        st.info("💡 **Local development:** `.env` fayl yaratib, ichiga quyidagini yozing:\n`OPENAI_API_KEY=sk-...`\n\n"
-                "💡 **Streamlit Cloud:** App Settings > Secrets bo'limida quyidagini yozing:\n"
-                "```toml\nOPENAI_API_KEY = \"sk-...\"\n```")
         st.stop()
 
 try:
@@ -29,10 +26,6 @@ except Exception as e:
     error_msg = str(e)
     if "401" in error_msg or "invalid_api_key" in error_msg or "Incorrect API key" in error_msg:
         st.error("❌ **API Key noto'g'ri yoki eskirgan!**")
-        st.info("💡 Iltimos, quyidagilarni tekshiring:\n"
-                "1. `.env` faylda API key to'g'ri yozilganmi?\n"
-                "2. API key hali ham faolmi? (https://platform.openai.com/account/api-keys)\n"
-                "3. API key to'liq ko'chirilganmi? (boshlanishi `sk-` bilan)")
     else:
         st.error(f"❌ Xatolik: {error_msg}")
     st.stop()
@@ -49,9 +42,6 @@ except (KeyError, FileNotFoundError):
     ASSISTANT_ID = os.getenv("OPENAI_ASSISTANT_ID")
     if not ASSISTANT_ID:
         st.error("❌ **Assistant ID topilmadi!**")
-        st.info("💡 **Local development:** `.env` faylda quyidagini yozing:\n`OPENAI_ASSISTANT_ID=asst-...`\n\n"
-                "💡 **Streamlit Cloud:** App Settings > Secrets bo'limida quyidagini yozing:\n"
-                "```toml\nOPENAI_ASSISTANT_ID = \"asst-...\"\n```")
         st.stop()
 
 # Sahifa sozlamalari
@@ -97,7 +87,6 @@ def get_or_create_thread():
             error_msg = str(e)
             if "401" in error_msg or "invalid_api_key" in error_msg or "Incorrect API key" in error_msg:
                 st.error("❌ **API Key noto'g'ri!** Thread yaratib bo'lmadi.")
-                st.info("💡 Iltimos, `.env` fayldagi API keyni tekshiring.")
             else:
                 st.error(f"❌ Thread yaratishda xatolik: {error_msg}")
             return None
