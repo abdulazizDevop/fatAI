@@ -72,6 +72,21 @@ def preprocess_question(question):
         st.warning(f"⚠️ Transliteration xatolik: {e}")
         return question, "failed"
 
+def convert_to_cyrillic(text):
+    """
+    Javobni har doim kiril yozuvga o'giradi
+    """
+    try:
+        # Har doim lotin → kiril konversiya qilish
+        text_cyr = transliterator.transliterate(
+            text,
+            from_="lat",
+            to="cyr"
+        )
+        return text_cyr
+    except Exception as e:
+        # Xatolik bo'lsa, asl matnni qaytarish
+        return text
 
 # Thread yaratish funktsiyasi
 def get_or_create_thread():
@@ -160,16 +175,19 @@ if prompt := st.chat_input("Savolingizni yozing (lotin yozuvda)..."):
                         thread_id=thread_id
                     )
                     
-                    # Eng oxirgi javob (assistant) - kiril yozuvda
+                    # Eng oxirgi javob (assistant)
                     response = messages.data[0].content[0].text.value
                     
+                    # Javobni har doim kiril yozuvga o'girish
+                    response_cyr = convert_to_cyrillic(response)
+                    
                     # Javobni ko'rsatish (kiril yozuvda)
-                    st.markdown(response)
+                    st.markdown(response_cyr)
                     
                     # Session ga saqlash
                     st.session_state.messages.append({
                         "role": "assistant",
-                        "content": response  # Kiril yozuvda saqlanadi
+                        "content": response_cyr  # Kiril yozuvda saqlanadi
                     })
                 elif run.status == 'failed':
                     error_msg = f"❌ Xatolik yuz berdi: {run.last_error.message if run.last_error else run.status}"
